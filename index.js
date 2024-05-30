@@ -21,15 +21,61 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
+
+    /////my code from here//////
+
+    const database = client.db("grocery"); // Replace with your database name
+    const collection = database.collection("allgrocery"); // Replace with your collection name
+
+    //get all fruits///////
+    app.get("/fruits", async (req, res) => {
+      try {
+        const query = { catagory: "fruits" };
+        const fruits = await collection.find(query).toArray();
+        res.status(200).json(fruits);
+      } catch (error) {
+        res.status(500).json({ message: "Error retrieving fruits", error });
+      }
+    });
+
+    ////get all vegitables///////////
+    app.get("/vegitables", async (req, res) => {
+      try {
+        const query = { catagory: "vegitables" };
+        const fruits = await collection.find(query).toArray();
+        res.status(200).json(fruits);
+      } catch (error) {
+        res.status(500).json({ message: "Error retrieving fruits", error });
+      }
+    });
+
+    /////get all dairy///////
+    app.get("/dairy", async (req, res) => {
+      try {
+        const query = { catagory: "dairy" };
+        const fruits = await collection.find(query).toArray();
+        res.status(200).json(fruits);
+      } catch (error) {
+        res.status(500).json({ message: "Error retrieving fruits", error });
+      }
+    });
+
+    /////get all meat///////
+    app.get("/meat", async (req, res) => {
+      try {
+        const query = { catagory: "meat" };
+        const fruits = await collection.find(query).toArray();
+        res.status(200).json(fruits);
+      } catch (error) {
+        res.status(500).json({ message: "Error retrieving fruits", error });
+      }
+    });
   } finally {
-    // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
