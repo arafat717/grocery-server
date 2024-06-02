@@ -31,6 +31,7 @@ async function run() {
 
     const database = client.db("grocery"); // Replace with your database name
     const collection = database.collection("allgrocery"); // Replace with your collection name
+    const userCollection = database.collection("user"); // Replace with your collection name
 
     //get all fruits///////
     app.get("/fruits", async (req, res) => {
@@ -137,15 +138,28 @@ async function run() {
       try {
         const newProduct = req.body;
         const result = await collection.insertOne(newProduct);
-        res
-          .status(201)
-          .json({
-            message: "Product created successfully",
-            productId: result.insertedId,
-          });
+        res.status(201).json({
+          message: "Product created successfully",
+          productId: result.insertedId,
+        });
       } catch (error) {
         res.status(500).json({ message: "Error creating product", error });
       }
+    });
+
+    //////user related api ///
+
+    app.post("/user", async (req, res) => {
+      const user = req.body;
+      const IsUserExist = await userCollection.findOne({ email: user.email });
+      if (IsUserExist?._id) {
+        res.send({
+          status: "success",
+          message: "Login Succesful",
+        });
+      }
+      const result = await userCollection.insertOne(user);
+      res.send(result);
     });
   } finally {
     // await client.close();
