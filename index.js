@@ -151,14 +151,19 @@ async function run() {
 
     app.post("/user", async (req, res) => {
       const user = req.body;
-      const IsUserExist = await userCollection.findOne({ email: user.email });
+      const IsUserExist = await userCollection.findOne({ email: user?.email });
       if (IsUserExist?._id) {
-        res.send({
+        return res.send({
           status: "success",
           message: "Login Succesful",
         });
       }
       const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await userCollection.findOne({ email });
       res.send(result);
     });
   } finally {
