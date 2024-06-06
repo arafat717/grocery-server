@@ -172,6 +172,17 @@ async function run() {
       const result = await userCollection.findOne({ email });
       res.send(result);
     });
+
+    app.patch("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const result = await userCollection.updateOne(
+        { email },
+        { $set: user },
+        { upsert: true }
+      );
+      res.send(result);
+    });
   } finally {
     // await client.close();
   }
