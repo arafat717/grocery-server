@@ -1,12 +1,24 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+function createToken(user) {
+  const token = jwt.sign(
+    {
+      email: user.email,
+    },
+    "secret",
+    { expiresIn: "7d" }
+  );
+  return token;
+}
 
 const uri = process.env.MONGODB_URI;
 
@@ -151,15 +163,17 @@ async function run() {
 
     app.post("/user", async (req, res) => {
       const user = req.body;
+      const token = createToken(user);
       const IsUserExist = await userCollection.findOne({ email: user?.email });
       if (IsUserExist?._id) {
         return res.send({
           status: "success",
           message: "Login Succesful",
+          token,
         });
       }
-      const result = await userCollection.insertOne(user);
-      res.send(result);
+      await userCollection.insertOne(user);
+      res.send(token);
     });
     app.get("/user/get/:id", async (req, res) => {
       const id = req.params.id;
