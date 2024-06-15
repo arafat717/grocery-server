@@ -20,6 +20,17 @@ function createToken(user) {
   return token;
 }
 
+function VerifyToken(req, res, next) {
+  const authToken = req.headers.authorization.split(" ")[1];
+  console.log(authToken);
+  const verify = jwt.verify(authToken, "secret");
+  if (!verify?.email) {
+    return res.send("You are not authorized!");
+  }
+  req.user = verify.email;
+  next();
+}
+
 const uri = process.env.MONGODB_URI;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -125,7 +136,7 @@ async function run() {
     });
 
     // Route to update a single product by ID using PATCH
-    app.patch("/product/:id", async (req, res) => {
+    app.patch("/product/:id", VerifyToken, async (req, res) => {
       try {
         const id = req.params.id;
         if (!ObjectId.isValid(id)) {
