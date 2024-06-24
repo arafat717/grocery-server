@@ -55,6 +55,15 @@ async function run() {
     const database = client.db("grocery"); // Replace with your database name
     const collection = database.collection("allgrocery"); // Replace with your collection name
     const userCollection = database.collection("user"); // Replace with your collection name
+    const cartCollection = database.collection("carts"); // Replace with your collection name
+
+    // all carts api here ////
+
+    app.post("/carts", async (req, res) => {
+      const cart = req.body;
+      const result = await cartCollection.insertOne(cart);
+      res.send(result);
+    });
 
     //get all fruits///////
     app.get("/fruits", async (req, res) => {
