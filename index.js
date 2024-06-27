@@ -69,6 +69,13 @@ async function run() {
       res.send(result);
     });
 
+    app.delete("/carts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
+
     app.post("/carts", async (req, res) => {
       const cart = req.body;
       const result = await cartCollection.insertOne(cart);
@@ -205,6 +212,12 @@ async function run() {
       await userCollection.insertOne(user);
       res.send(token);
     });
+
+    app.get("/users", async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
     app.get("/user/get/:id", async (req, res) => {
       const id = req.params.id;
       const result = await userCollection.findOne({ _id: new ObjectId(id) });
