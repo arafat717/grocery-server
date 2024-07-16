@@ -4,6 +4,7 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const app = express();
 require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIP_KEY);
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -52,10 +53,11 @@ async function run() {
 
     /////my code from here//////
 
-    const database = client.db("grocery"); // Replace with your database name
-    const collection = database.collection("allgrocery"); // Replace with your collection name
-    const userCollection = database.collection("user"); // Replace with your collection name
-    const cartCollection = database.collection("carts"); // Replace with your collection name
+    const database = client.db("grocery");
+    const collection = database.collection("allgrocery");
+    const userCollection = database.collection("user");
+    const cartCollection = database.collection("carts");
+    const paymentCollection = database.collection("payments");
 
     // all carts api here ////
 
@@ -67,6 +69,20 @@ async function run() {
       const query = { email: email };
       const result = await cartCollection.find(query).toArray();
       res.send(result);
+    });
+
+    app.post("/create-payment-intent", async (req, res) => {
+      const { price } = req.body;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
     });
 
     app.delete("/carts/:id", async (req, res) => {
@@ -277,6 +293,18 @@ async function run() {
         { upsert: true }
       );
       res.send(result);
+    });
+
+    // payment collection api
+
+    app.post("/payments", async (req, res) => {
+      const payment = req.body;
+      const result = await paymentCollection.insertOne(payment);
+      const query = {
+        _id: { $in: payment.cartProducts.map((id) => new ObjectId(id)) },
+      };
+      const deleteResult = await cartCollection.deleteMany(query);
+      res.send({ result, deleteResult });
     });
   } finally {
     // await client.close();
