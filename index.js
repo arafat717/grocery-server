@@ -306,6 +306,22 @@ async function run() {
       const deleteResult = await cartCollection.deleteMany(query);
       res.send({ result, deleteResult });
     });
+
+    app.get("/admin-stats", async (req, res) => {
+      const user = await userCollection.estimatedDocumentCount();
+      const products = await collection.estimatedDocumentCount();
+      const orders = await paymentCollection.estimatedDocumentCount();
+
+      const payments = await paymentCollection.find().toArray();
+      const revenue = payments.reduce((sum, payment) => sum + payment.price, 0);
+
+      res.send({
+        user,
+        products,
+        orders,
+        revenue,
+      });
+    });
   } finally {
     // await client.close();
   }
