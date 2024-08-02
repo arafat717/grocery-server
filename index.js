@@ -98,8 +98,14 @@ async function run() {
       res.send(result);
     });
 
+    // get all products
+    app.get("/products", async (req, res) => {
+      const products = await collection.find().toArray();
+      res.send(products);
+    });
+
     //get all fruits///////
-    app.get("/fruits", async (req, res) => {
+    app.get("/products/fruits", async (req, res) => {
       try {
         const query = { catagory: "fruits" };
         const fruits = await collection.find(query).toArray();
@@ -110,7 +116,7 @@ async function run() {
     });
 
     ////get all vegitables///////////
-    app.get("/vegitables", async (req, res) => {
+    app.get("/products/vegitables", async (req, res) => {
       try {
         const query = { catagory: "vegitables" };
         const fruits = await collection.find(query).toArray();
@@ -121,7 +127,7 @@ async function run() {
     });
 
     /////get all dairy///////
-    app.get("/dairy", async (req, res) => {
+    app.get("/products/dairy", async (req, res) => {
       try {
         const query = { catagory: "dairy" };
         const fruits = await collection.find(query).toArray();
@@ -132,7 +138,7 @@ async function run() {
     });
 
     /////get all meat///////
-    app.get("/meat", async (req, res) => {
+    app.get("/products/meat", async (req, res) => {
       try {
         const query = { catagory: "meat" };
         const fruits = await collection.find(query).toArray();
